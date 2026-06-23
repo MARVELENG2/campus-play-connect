@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offline | Campus Play Connect</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #1e3a8a, #0f172a);
+        color: white;
+        padding: 24px;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 420px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        padding: 28px;
+        text-align: center;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      }
+
+      .logo {
+        width: 76px;
+        height: 76px;
+        margin: 0 auto 18px;
+        border-radius: 22px;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1e3a8a;
+        font-size: 24px;
+        font-weight: 900;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 26px;
+        font-weight: 900;
+      }
+
+      p {
+        margin: 14px 0 24px;
+        color: #dbeafe;
+        line-height: 1.6;
+        font-size: 15px;
+      }
+
+      button {
+        width: 100%;
+        border: none;
+        border-radius: 14px;
+        padding: 14px 18px;
+        background: #facc15;
+        color: #111827;
+        font-size: 15px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .small {
+        margin-top: 16px;
+        font-size: 12px;
+        color: #bfdbfe;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main class="card">
+      <div class="logo">CPC</div>
+
+      <h1>You are offline</h1>
+
+      <p>
+        Campus Play Connect needs internet to load marketplace data, chats,
+        orders, and seller catalogs. Check your connection and try again.
+      </p>
+
+      <button onclick="window.location.reload()">Try Again</button>
+
+      <div class="small">Campus Play Connect • BOUESTI Marketplace</div>
+    </main>
+  </body>
+</html>
