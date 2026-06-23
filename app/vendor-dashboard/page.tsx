@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import NotificationPermissionButton from "@/components/NotificationPermissionButton";
 
 type VendorProfile = {
   id: string;
@@ -38,6 +39,7 @@ type Order = {
   created_at: string;
   updated_at: string;
 };
+<NotificationPermissionButton />
 
 export default function VendorDashboardPage() {
   const [profile, setProfile] = useState<VendorProfile | null>(null);
