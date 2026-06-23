@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import NotificationPermissionButton from "@/components/NotificationPermissionButton";
+import { showLocalNotification } from "@/lib/notifications";
 
 type VendorProfile = {
   id: string;
@@ -39,7 +40,6 @@ type Order = {
   created_at: string;
   updated_at: string;
 };
-<NotificationPermissionButton />
 
 export default function VendorDashboardPage() {
   const [profile, setProfile] = useState<VendorProfile | null>(null);
@@ -160,9 +160,77 @@ export default function VendorDashboardPage() {
     loadVendorProfile();
   }, []);
 
+  useEffect(() => {
+    if (!profile?.id) return;
+
+    const conversationIds = new Set(
+      conversations.map((conversation) => conversation.id)
+    );
+
+    const messagesChannel = supabase
+      .channel(`vendor-new-messages-${profile.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+        },
+        async (payload) => {
+          const message = payload.new as {
+            id: string;
+            conversation_id: string;
+            sender_type: string;
+            body?: string;
+          };
+
+          if (
+            message.sender_type === "student" &&
+            conversationIds.has(message.conversation_id)
+          ) {
+            showLocalNotification(
+              "New student message",
+              message.body || "A student sent you a new message.",
+              `/vendor-dashboard/messages/${message.conversation_id}`
+            );
+
+            await loadDashboardCounts();
+          }
+        }
+      )
+      .subscribe();
+
+    const ordersChannel = supabase
+      .channel(`vendor-new-orders-${profile.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "orders",
+          filter: `vendor_id=eq.${profile.id}`,
+        },
+        async () => {
+          showLocalNotification(
+            "New order received",
+            "A student placed a new order.",
+            "/vendor-dashboard/orders"
+          );
+
+          await loadDashboardCounts();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(messagesChannel);
+      supabase.removeChannel(ordersChannel);
+    };
+  }, [profile?.id, conversations]);
+
   const messageCount = conversations.filter(
-  (conversation) => conversation.unread_for_vendor === true
-).length;
+    (conversation) => conversation.unread_for_vendor === true
+  ).length;
 
   const pendingOrderCount = orders.filter(
     (order) => order.status === "pending"
@@ -219,6 +287,10 @@ export default function VendorDashboardPage() {
 
         {profile && (
           <>
+            <section className="mt-10">
+              <NotificationPermissionButton />
+            </section>
+
             <section className="mt-10 grid gap-6 md:grid-cols-4">
               <div className="rounded-2xl bg-white p-6 shadow-sm">
                 <p className="text-sm font-bold text-gray-600">
@@ -286,7 +358,7 @@ export default function VendorDashboardPage() {
               <DashboardMetric
                 title="Messages"
                 value={messageCount}
-                description="Total student conversations"
+                description="Unread student conversations"
               />
 
               <DashboardMetric
